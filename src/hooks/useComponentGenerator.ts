@@ -17,10 +17,13 @@ function loadComponentsFromStorage(): GeneratedComponent[] {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return [];
     const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed.map((c: any) => ({
-      ...c,
-      createdAt: new Date(c.createdAt),
-    })) : [];
+    return Array.isArray(parsed) ? parsed.map((c: any) => {
+      const createdAt = c.createdAt ? new Date(c.createdAt) : new Date();
+      return {
+        ...c,
+        createdAt: isNaN(createdAt.getTime()) ? new Date() : createdAt,
+      };
+    }) : [];
   } catch {
     return [];
   }

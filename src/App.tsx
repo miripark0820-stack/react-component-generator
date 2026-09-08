@@ -15,7 +15,10 @@ const PROVIDER_STORAGE_KEY = 'rcg_provider';
 function getStoredProvider(): Provider {
   try {
     const stored = localStorage.getItem(PROVIDER_STORAGE_KEY);
-    return (stored as Provider) || 'google';
+    if (stored === 'anthropic' || stored === 'google') {
+      return stored;
+    }
+    return 'google';
   } catch {
     return 'google';
   }
