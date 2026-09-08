@@ -10,10 +10,24 @@ const PROVIDER_CONFIG = {
   google: { label: 'Google', placeholder: 'AIza...' },
 } as const;
 
+const PROVIDER_STORAGE_KEY = 'rcg_provider';
+
+function getStoredProvider(): Provider {
+  try {
+    const stored = localStorage.getItem(PROVIDER_STORAGE_KEY);
+    if (stored === 'anthropic' || stored === 'google') {
+      return stored;
+    }
+    return 'google';
+  } catch {
+    return 'google';
+  }
+}
+
 function App() {
   const [apiKey, setApiKey] = useState('');
   const [showKey, setShowKey] = useState(false);
-  const [provider, setProvider] = useState<Provider>('google');
+  const [provider, setProvider] = useState<Provider>(getStoredProvider);
   const [envKeys, setEnvKeys] = useState<Record<Provider, boolean>>({
     anthropic: false,
     google: false,
@@ -27,6 +41,14 @@ function App() {
       .then((data) => setEnvKeys(data.envKeys))
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(PROVIDER_STORAGE_KEY, provider);
+    } catch {
+      console.warn('Failed to save provider to localStorage');
+    }
+  }, [provider]);
 
   const hasEnvKey = envKeys[provider];
 
